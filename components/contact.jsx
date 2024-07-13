@@ -2,8 +2,10 @@
 import React from 'react';
 import Navbar from './navbar';
 import Footer from './footer';
+import useScrollToTop from "../src/utils/scrollToTop";
 
 const Contact = () => {
+  useScrollToTop();
   return (
     <>
     <Navbar/>

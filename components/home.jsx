@@ -3,8 +3,10 @@ import Slider from './slider';
 import Navbar from './navbar';
 import Footer from './footer';
 import { Link } from 'react-router-dom';
+import useScrollToTop from "../src/utils/scrollToTop";
 
 const Home = () => {
+  useScrollToTop()
   return (
     <>
       <Navbar/>

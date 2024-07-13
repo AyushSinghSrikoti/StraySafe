@@ -6,6 +6,9 @@ import { db } from "../firebase";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import useCurrentUser from "../src/utils/getcurrentuser";
 import { useNavigate } from "react-router-dom";
+import { IoCloseCircle } from "react-icons/io5";
+import useScrollToTop from "../src/utils/scrollToTop";
+import { IoBookmark, IoBookmarkOutline } from "react-icons/io5"; // Import bookmark icons
 
 const Finder = () => {
   const user = useCurrentUser();
@@ -15,7 +18,10 @@ const Finder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const [newComment, setNewComment] = useState("");
+  const [bookmarkedAnimals, setBookmarkedAnimals] = useState([]); // State for bookmarked animals
   const navigate = useNavigate();
+
+  useScrollToTop();
 
   useEffect(() => {
     const fetchAnimals = async () => {
@@ -68,37 +74,55 @@ const Finder = () => {
 
     setSelectedAnimal({ ...selectedAnimal, comments: updatedComments });
     setNewComment("");
+    // navigate("/feed");
+    location.reload();
+    setIsModalOpen(true);
   };
 
   const handleLike = async (commentIndex) => {
     if (!user) return;
 
     const updatedComments = selectedAnimal.comments.map((comment, index) => {
-        if (index === commentIndex) {
-            if (!Array.isArray(comment.likes)) {
-                comment.likes = [];
-            }
-            if (comment.likes.includes(user.uid)) {
-                return comment;
-            } else {
-                return {
-                    ...comment,
-                    likes: [...comment.likes, user.uid]
-                };
-            }
+      if (index === commentIndex) {
+        if (!Array.isArray(comment.likes)) {
+          comment.likes = [];
         }
-        return comment;
+        if (comment.likes.includes(user.uid)) {
+          return comment;
+        } else {
+          return {
+            ...comment,
+            likes: [...comment.likes, user.uid]
+          };
+        }
+      }
+      return comment;
     });
 
     setSelectedAnimal(prevAnimal => ({
-        ...prevAnimal,
-        comments: updatedComments
+      ...prevAnimal,
+      comments: updatedComments
     }));
 
     const animalDoc = doc(db, 'animals', selectedAnimal.id);
     await updateDoc(animalDoc, { comments: updatedComments });
-};
+  };
 
+  const toggleBookmark = (animalId) => {
+    if (bookmarkedAnimals.includes(animalId)) {
+      // Remove bookmark
+      const updatedBookmarks = bookmarkedAnimals.filter(id => id !== animalId);
+      setBookmarkedAnimals(updatedBookmarks);
+    } else {
+      // Add bookmark
+      const updatedBookmarks = [...bookmarkedAnimals, animalId];
+      setBookmarkedAnimals(updatedBookmarks);
+    }
+  };
+
+  const isAnimalBookmarked = (animalId) => {
+    return bookmarkedAnimals.includes(animalId);
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -129,21 +153,34 @@ const Finder = () => {
                     className="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-4"
                   />
                   <div className="flex flex-col justify-between">
-                    <h2 className="text-2xl font-bold mb-2">{animal.animalName}</h2>
+                    <div className="flex items-center mb-2">
+                      <h2 className="text-2xl font-bold mr-2">{animal.animalName}</h2>
+                      {isAnimalBookmarked(animal.id) ? (
+                        <IoBookmark
+                          className="text-red-500 cursor-pointer"
+                          onClick={() => toggleBookmark(animal.id)}
+                        />
+                      ) : (
+                        <IoBookmarkOutline
+                          className="text-gray-500 cursor-pointer"
+                          onClick={() => toggleBookmark(animal.id)}
+                        />
+                      )}
+                    </div>
                     <p className="text-gray-700 mb-2"><strong>Location:</strong> {animal.animalLocation}</p>
                     <p className="text-gray-700 mb-2"><strong>Nature:</strong> {animal.animalNature}</p>
                     <p className="text-gray-700 mb-2"><strong>Description:</strong> {animal.animalDescription}</p>
                     {animal.geolocationImageUrl && (
                       <button
                         onClick={() => handleGeolocationClick(animal.geolocationImageUrl)}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+                        className="bg-[#E0F2FE] hover:bg-[#B2EBF2] text-[#0288D1] font-bold py-2 px-4 rounded mt-4"
                       >
                         Show Geolocation Image
                       </button>
                     )}
                     <button
                       onClick={() => handleCommentClick(animal)}
-                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
+                      className="bg-[#E0F2FE] hover:bg-[#B2EBF2] text-[#0288D1] font-bold py-2 px-4 rounded mt-4"
                     >
                       Show Comments
                     </button>
@@ -166,7 +203,13 @@ const Finder = () => {
           className="modal"
           overlayClassName="overlay"
         >
-          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto">
+          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-0 right-0 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              <IoCloseCircle className="inline-block text-xl" />
+            </button>
             <h2 className="text-2xl font-bold mb-4">Comments for {selectedAnimal.animalName}</h2>
             <div className="mb-4">
               {selectedAnimal.comments && selectedAnimal.comments.length > 0 ? (
@@ -190,27 +233,25 @@ const Finder = () => {
                 <p className="text-gray-700">No comments yet.</p>
               )}
             </div>
-            <form onSubmit={handleCommentSubmit}>
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                className="w-full px-3 py-2 border rounded mb-4"
-                placeholder="Add a comment..."
-                required
-              />
-              <button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Submit
-              </button>
-            </form>
-            <button
-              onClick={closeModal}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-4"
-            >
-              Close
-            </button>
+            {user && (
+              <form onSubmit={handleCommentSubmit}>
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="w-full border rounded p-2 mb-2"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#E0F2FE] hover:bg-[#B2EBF2] text-[#0288D1] font-bold py-2 px-4 rounded"
+                >
+                  Add Comment
+                </button>
+              </form>
+            )}
+            {!user && (
+              <p className="text-gray-700 mt-4">Login to comment.</p>
+            )}
           </div>
         </Modal>
       )}

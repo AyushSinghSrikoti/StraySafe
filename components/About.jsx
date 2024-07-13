@@ -1,8 +1,10 @@
 import Navbar from "./navbar";
 import Footer from "./footer";
 import { Link } from "react-router-dom";
+import useScrollToTop from "../src/utils/scrollToTop";
 
 function About(){
+    useScrollToTop()
     return(
         <>
         <Navbar/>

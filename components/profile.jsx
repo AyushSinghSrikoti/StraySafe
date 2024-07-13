@@ -6,8 +6,10 @@ import { storage , db } from "../firebase"; // Import firestore from firebase
 import { v4 } from "uuid";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
+import useScrollToTop from "../src/utils/scrollToTop";
 
 const Profile = () => {
+  useScrollToTop();
   const user = useCurrentUser();
   const [animalName, setAnimalName] = useState('');
   const [animalLocation, setAnimalLocation] = useState('');

@@ -4,7 +4,9 @@ import { FaGoogle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { signInWithGoogle } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import useScrollToTop from "../src/utils/scrollToTop";
 function SignIn(){
+  useScrollToTop();
   const navigate = useNavigate();
 
   const handleSignUp = async () => {

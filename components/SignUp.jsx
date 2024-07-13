@@ -4,9 +4,10 @@ import { FaGoogle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { signInWithGoogle } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import useScrollToTop from "../src/utils/scrollToTop";
 function SignUp() {
     const navigate = useNavigate();
-
+    useScrollToTop();
     const handleSignUp = async () => {
         await signInWithGoogle();
         navigate('/');
