@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { IoCloseCircle } from "react-icons/io5";
 import useScrollToTop from "../src/utils/scrollToTop";
 import { IoBookmark, IoBookmarkOutline } from "react-icons/io5"; // Import bookmark icons
+// import { showErrorToast } from "../src/utils/toastUtils";
 
 const Finder = () => {
   const user = useCurrentUser();
@@ -20,6 +21,8 @@ const Finder = () => {
   const [newComment, setNewComment] = useState("");
   const [bookmarkedAnimals, setBookmarkedAnimals] = useState([]); // State for bookmarked animals
   const navigate = useNavigate();
+
+  // showErrorToast("chal rha hai");
 
   useScrollToTop();
 
@@ -145,14 +148,14 @@ const Finder = () => {
           />
           {filteredAnimals.length > 0 ? (
             filteredAnimals.map(animal => (
-              <div key={animal.id} className="bg-white shadow-lg rounded-lg p-6 mb-4 w-full">
-                <div className="flex flex-col md:flex-row">
+              <div key={animal.id} className="bg-white shadow-lg  rounded-lg p-6 mb-4 w-full h-96 overflow-hidden /*bg-green-500*/"> {/* Fixed height */}
+                <div className="flex flex-col md:flex-row h-full">
                   <img
                     src={animal.imageUrl}
                     alt={animal.animalName}
-                    className="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-4"
+                    className="w-full md:w-1/3 rounded-lg mb-4 md:mb-0 md:mr-4 object-cover"
                   />
-                  <div className="flex flex-col justify-between">
+                  <div className="flex flex-col justify-between /*bg-red-300*/ overflow-hidden overflow-y-scroll"> {/* Added overflow-hidden */}
                     <div className="flex items-center mb-2">
                       <h2 className="text-2xl font-bold mr-2">{animal.animalName}</h2>
                       {isAnimalBookmarked(animal.id) ? (
@@ -169,7 +172,7 @@ const Finder = () => {
                     </div>
                     <p className="text-gray-700 mb-2"><strong>Location:</strong> {animal.animalLocation}</p>
                     <p className="text-gray-700 mb-2"><strong>Nature:</strong> {animal.animalNature}</p>
-                    <p className="text-gray-700 mb-2"><strong>Description:</strong> {animal.animalDescription}</p>
+                    <p className="text-gray-700 mb-2 "><strong>Description:</strong> {animal.animalDescription}</p> {/* Added overflow-hidden and overflow-ellipsis */}
                     {animal.geolocationImageUrl && (
                       <button
                         onClick={() => handleGeolocationClick(animal.geolocationImageUrl)}

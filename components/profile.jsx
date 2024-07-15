@@ -7,6 +7,7 @@ import { v4 } from "uuid";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"; 
 import useScrollToTop from "../src/utils/scrollToTop";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   useScrollToTop();
@@ -17,6 +18,7 @@ const Profile = () => {
   const [animalImage, setAnimalImage] = useState('');
   const [animalDescription, setAnimalDescription] = useState('');
   const [geolocationImage, setGeolocationImage] = useState('');
+  const navigate = useNavigate();
 
   const handleFileChange = (e, setImage) => {
     if (e.target.files[0]) {
@@ -61,7 +63,7 @@ const Profile = () => {
       setAnimalImage(null);
       setGeolocationImage(null);
       setAnimalDescription('');
-      location.reload(); // Reload the page or update state as needed
+      navigate('/feed');
     } catch (error) {
       console.error('Error storing animal data:', error);
     }

@@ -29,3 +29,23 @@
   background-color: rgba(0, 0, 0, 0.75);
   z-index: 1000;
 }
+
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;  /* Width of the scrollbar */
+  height: 6px; /* Height of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;  /* Background of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0096FF;  /* Scrollbar thumb color (blue tint) */
+  border-radius: 10px;  /* Rounded corners for the scrollbar thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #005bb5;  /* Darker blue on hover */
+}
